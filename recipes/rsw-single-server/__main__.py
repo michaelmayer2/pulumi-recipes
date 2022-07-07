@@ -27,11 +27,11 @@ class ConfigValues:
     public_key: str = field(init=False)
 
     def __post_init__(self):
-        self.email = config.require("email")
-        self.rsw_license = config.require("rsw_license")
-        self.daily = config.require("daily").lower() in ("yes", "true", "t", "1")
-        self.ssl = config.require("ssl").lower() in ("yes", "true", "t", "1")
-        self.public_key = config.require("public_key")   
+        self.email = self.config.require("email")
+        self.rsw_license = self.config.require("rsw_license")
+        self.daily = self.config.require("daily").lower() in ("yes", "true", "t", "1")
+        self.ssl = self.config.require("ssl").lower() in ("yes", "true", "t", "1")
+        self.public_key = self.config.require("public_key")   
 
 
 def get_private_key(file_path: str) -> str:
@@ -70,7 +70,7 @@ def hash_file(path: str) -> pulumi.Output:
 
 
 # ------------------------------------------------------------------------------
-# Infrastruture
+# Infrastructure
 # ------------------------------------------------------------------------------
 
 def main():
@@ -211,7 +211,7 @@ def main():
         remote_path='justfile', 
         connection=connection, 
         opts=pulumi.ResourceOptions(depends_on=[rsw_server]),
-        triggers=[hash_file("server-side-justfile")]
+        triggers=[hash_file("server-side-files/justfile")]
     )
 
     # --------------------------------------------------------------------------

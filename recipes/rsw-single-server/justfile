@@ -11,20 +11,29 @@ LOG_LEVEL := "3"
 LOG_FILE := "_logs.txt"
 
 # ------------------------------------------------------------------------------
-# General
+# Server related
 # ------------------------------------------------------------------------------
 
-ssh:
+server-ssh:
     ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@$(pulumi stack output rsw_public_dns)
 
-up:
+server-open:
+    open {{ if RSW_SSL == "true" { "https://$(pulumi stack output rsw_public_dns)" } else { "http://$(pulumi stack output rsw_public_ip):8787" } }}
+
+
+# ------------------------------------------------------------------------------
+# pulumi related
+# ------------------------------------------------------------------------------
+
+# Run pulumi up -y
+pulumi-up:
     pulumi up -y --logtostderr -v={{LOG_LEVEL}} 2> {{LOG_FILE}}
 
-destroy:
+# Run pulumi destory -y
+pulumi-destroy:
     pulumi destroy -y --logtostderr -v={{LOG_LEVEL}} 2> {{LOG_FILE}}
 
-open:
-    open {{ if RSW_SSL == "true" { "http://$(pulumi stack output rsw_public_ip):8787" } else { "https://$(pulumi stack output rsw_public_dns)" } }}
+
 
 # ------------------------------------------------------------------------------
 # Setup and teardown
@@ -72,13 +81,4 @@ key-pair-delete:
     rm -f key.pem key.pub
 
 key-pair-new-script:
-    #!./venv/bin/python
-    import pulumi
-    from Crypto.PublicKey import RSA
-    key = RSA.generate(2048)
-    private_key = key.exportKey("PEM")
-    public_key = key.publickey().exportKey("OpenSSH")
-    with open("key.pem", "w") as f:
-        f.write(private_key.decode())
-    with open("key.pub", "w") as f:
-        f.write(public_key.decode())
+    ./venv/bin/python scripts/new_keypair.py
