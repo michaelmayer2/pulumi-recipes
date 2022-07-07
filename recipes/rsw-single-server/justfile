@@ -1,0 +1,84 @@
+set dotenv-load
+
+# RStudio Workbench options
+RSW_LICENSE := env_var("RSW_LICENSE")
+RSW_EMAIL := env_var_or_default("RSW_EMAIL", "email@example.com")
+RSW_SSL := env_var_or_default("RSW_SSL", "false")
+RSW_DAILY := env_var_or_default("RSW_DAILY", "false")
+
+# Pulumi logging options
+LOG_LEVEL := "3"
+LOG_FILE := "_logs.txt"
+
+# ------------------------------------------------------------------------------
+# General
+# ------------------------------------------------------------------------------
+
+ssh:
+    ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@$(pulumi stack output rsw_public_dns)
+
+up:
+    pulumi up -y --logtostderr -v={{LOG_LEVEL}} 2> {{LOG_FILE}}
+
+destroy:
+    pulumi destroy -y --logtostderr -v={{LOG_LEVEL}} 2> {{LOG_FILE}}
+
+open:
+    open {{ if RSW_SSL == "true" { "http://$(pulumi stack output rsw_public_ip):8787" } else { "https://$(pulumi stack output rsw_public_dns)" } }}
+
+# ------------------------------------------------------------------------------
+# Setup and teardown
+# ------------------------------------------------------------------------------
+
+# Create a virtual environemnt, keypair, and then spin up the infrastructure
+init py='python' stackname='dev':
+    {{py}} -m venv venv
+    source venv/bin/activate
+    venv/bin/python -m pip install --upgrade pip wheel
+    venv/bin/pip install -r requirements.txt
+    pulumi stack init {{stackname}}
+    pulumi stack select {{stackname}}
+    just key-pair-new
+    pulumi config set email {{RSW_EMAIL}}
+    pulumi config set --secret rsw_license $RSW_LICENSE
+    pulumi config set daily {{RSW_DAILY}}
+    pulumi config set ssl {{RSW_SSL}}
+    cat key.pub | pulumi config set public_key
+    pulumi up
+
+
+# Tear down all of the infraturure and associated configuration
+clean stackname='dev':
+    pulumi destroy
+    rm -f Pulumi.$(pulumi stack --show-name).yaml
+    rm -rf venv
+    rm -rf __pycache__
+    rm -f _logs.txt
+    just key-pair-delete
+    pulumi stack rm {{stackname}}
+
+# ------------------------------------------------------------------------------
+# KeyPairs
+# ------------------------------------------------------------------------------
+
+# Create a new keypair
+key-pair-new:
+    just key-pair-delete
+    just key-pair-new-script
+    chmod 400 key.pem
+    cat key.pub | pulumi config set public_key
+
+key-pair-delete:
+    rm -f key.pem key.pub
+
+key-pair-new-script:
+    #!./venv/bin/python
+    import pulumi
+    from Crypto.PublicKey import RSA
+    key = RSA.generate(2048)
+    private_key = key.exportKey("PEM")
+    public_key = key.publickey().exportKey("OpenSSH")
+    with open("key.pem", "w") as f:
+        f.write(private_key.decode())
+    with open("key.pub", "w") as f:
+        f.write(public_key.decode())
