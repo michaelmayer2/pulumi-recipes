@@ -47,8 +47,6 @@ export AWS_SECRET_ACCESS_KEY=<YOUR_SECRET_ACCESS_KEY>
 
 ## Recipes
 
-The recipes below have been tested and are confirmed to work. Additional recipes can be found in [recipes/wip/](./recipes/wip/). These recipes are still a work in progress.
-
 | Name                                             | Descritption                                                                | Architecture                                    |
 | ------------------------------------------------ | --------------------------------------------------------------------------- | ----------------------------------------------- |
 | [rsw-single-server**](recipes/rsw-single-server) | A single server deployment of RStudio Workbench with code-server installed. | ![](recipes/rsw-single-server/infra.drawio.png) |
