@@ -18,7 +18,7 @@ There are three primary files / directories:
 aws sso login
 ```
 
-### Step 1: Create new virtual environment
+### Step 2: Create new virtual environment
 
 ```bash
 python -m venv venv
@@ -27,7 +27,7 @@ python -m pip install --upgrade pip wheel setuptools
 pip install -r requirements.txt
 ```
 
-### Step 2: Pulumi configuration
+### Step 3: Pulumi configuration
 
 Select your pulumi stack.
 
@@ -53,7 +53,7 @@ cat key.pub | pulumi config set public_key
 
 ⚠️ If you set `pulumi config set ssl true` Pulumi will create a self signed certificate. When you visit RStudio Workbench on your browser it will not open in Google Chrome. It will open in FireFox after you accept the security warnings.
 
-### Step 3: Spin up infra
+### Step 4: Spin up infra
 
 Create all of the infrastructure.
 
@@ -61,7 +61,7 @@ Create all of the infrastructure.
 pulumi up
 ```
 
-### Step 3: Validate that RSW is working
+### Step 5: Validate that RSW is working
 
 Visit RSW in your browser (use FireFox instead of Chrome):
 
