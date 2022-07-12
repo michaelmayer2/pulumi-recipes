@@ -1,0 +1,6 @@
+name: rsw-ha
+runtime:
+  name: python
+  options:
+    virtualenv: venv
+description: Deploy a high availability RStudio Workbench to AWS.

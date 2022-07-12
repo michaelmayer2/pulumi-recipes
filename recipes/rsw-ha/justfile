@@ -1,0 +1,29 @@
+LOG_LEVEL := "3"
+LOG_FILE := "_logs.txt"
+
+write:
+    #!/bin/zsh
+    cat <<EOF > tmp-config.txt
+    line 1
+    line 2
+    EOF
+
+ssh num="1":
+    ssh \
+        -i ${AWS_PRIVATE_KEY_PATH} \
+        -o StrictHostKeyChecking=no \
+        ubuntu@$(pulumi stack output rsw_{{num}}_public_dns)
+
+up:
+    pulumi up -y --logtostderr -v={{LOG_LEVEL}} 2> {{LOG_FILE}}
+
+destroy:
+    pulumi destroy -y --logtostderr -v={{LOG_LEVEL}} 2> {{LOG_FILE}}
+
+open:
+    open http://$(pulumi stack output rsw_1_public_ip):8787
+    open http://$(pulumi stack output rsw_2_public_ip):8787
+
+ip:
+    echo $(pulumi stack output rsw_1_public_ip)
+    echo $(pulumi stack output rsw_2_public_ip)
