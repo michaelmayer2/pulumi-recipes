@@ -27,7 +27,11 @@ build-rsw:
     just install-r 
     just symlink-r
     just install-rsw
+    sudo cp -r /etc/rstudio /etc/rstudio-original-conf-files
 
+    # Set up config files
+    just copy-config-files
+    
     # Restart
     sudo rstudio-server restart
 
@@ -71,6 +75,7 @@ edit-load-balancer:
 
 install-linux-tools:
     sudo apt-get update
+    sudo apt-get update
     sudo apt-get install -y tree
     sudo apt-get install -y bat
     sudo apt-get install -y gdebi-core
@@ -84,6 +89,11 @@ install-rsw:
 install-r r_version='4.1.2':
     curl -O https://cdn.rstudio.com/r/ubuntu-2004/pkgs/r-{{r_version}}_1_amd64.deb
     sudo gdebi r-{{r_version}}_1_amd64.deb -n
+
+copy-config-files:
+    sudo cp ~/rserver.conf /etc/rstudio/rserver.conf
+    sudo cp ~/load-balancer /etc/rstudio/load-balancer
+    sudo cp ~/database.conf /etc/rstudio/database.conf
 
 install-efs-utils:
     #!/bin/bash
