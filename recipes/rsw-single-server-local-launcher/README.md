@@ -2,7 +2,6 @@
 
 ![](infra.drawio.png)
 
-
 ## Usage
 
 Before getting started please read the project [README](../../README.md) to ensure you have all of the required dependencies installed.

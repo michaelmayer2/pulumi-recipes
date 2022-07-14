@@ -4,10 +4,12 @@
 
 ## Usage
 
-There are two primary files:
+Before getting started please read the project [README](../../README.md) to ensure you have all of the required dependencies installed.
+
+There are three primary files / directories:
 
 - `__main__.py`: contains the python code that will stand up the AWS resources.
-- `templates/justfile`: contains the commands required to install RSW and the required dependencies. This file will be copied to each ec2 instance so that it can be executed on the server.
+- `server-side-files/justfile`: contains the commands required to install RSW and the required dependencies. This file will be copied to each ec2 instance so that it can be executed on the server.
 
 ### Step 1: Log into AWS
 
