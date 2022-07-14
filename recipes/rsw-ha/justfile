@@ -16,9 +16,8 @@ destroy:
 # Server management
 # ------------------------------------------------------------------------------
 
-server-open:
-    open http://$(pulumi stack output rsw_1_public_ip):8787
-    open http://$(pulumi stack output rsw_2_public_ip):8787
+server-open num="1":
+    open http://$(pulumi stack output rsw_{{num}}_public_ip):8787
 
 server-ip:
     echo $(pulumi stack output rsw_1_public_ip)
