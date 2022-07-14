@@ -1,0 +1,70 @@
+set dotenv-load
+
+RSW_LICENSE := env_var("RSW_LICENSE")
+R_VERSION := env_var_or_default("R_VERSION", "4.1.2")
+PYTHON_VERSION := env_var_or_default("PYTHON_VERSION", "3.10.4")
+
+# -----------------------------------------------------------------------------
+# Build RSW
+# -----------------------------------------------------------------------------
+
+# Install RStudio workbench and all of the dependencies
+build-rsw: 
+    # Basic setup
+    sudo apt-get update
+    sudo apt-get update
+    sudo apt-get install -y gdebi-core
+
+    # Add some test users
+    just add-user sam password
+    just add-user jake password
+    just add-user olivia password
+
+    # Install RSW and required dependencies
+    just install-r 
+    just symlink-r
+    just install-python
+    just install-rsw
+
+    # Restart
+    sudo rstudio-server restart
+
+# -----------------------------------------------------------------------------
+# Install
+# -----------------------------------------------------------------------------
+
+install-rsw:
+    curl -O https://download2.rstudio.org/server/bionic/amd64/rstudio-workbench-2022.02.3-492.pro3-amd64.deb
+    sudo gdebi -n rstudio-workbench-2022.02.3-492.pro3-amd64.deb
+    sudo rstudio-server license-manager activate $RSW_LICENSE
+
+install-r:
+    curl -O https://cdn.rstudio.com/r/ubuntu-2004/pkgs/r-{{R_VERSION}}_1_amd64.deb
+    sudo gdebi -n r-{{R_VERSION}}_1_amd64.deb
+
+symlink-r:
+    sudo ln -s /opt/R/{{R_VERSION}}/bin/R /usr/local/bin/R
+    sudo ln -s /opt/R/{{R_VERSION}}/bin/Rscript /usr/local/bin/Rscript
+
+install-python:
+    # https://docs.rstudio.com/resources/install-python/
+    # install python
+    sudo mkdir /opt/python
+    sudo curl -fsSL -o /opt/python/miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh 
+    sudo chmod 755 /opt/python/miniconda.sh
+    sudo /opt/python/miniconda.sh -b -p /opt/python/miniconda
+    sudo /opt/python/miniconda/bin/conda create --quiet --yes --prefix /opt/python/{{PYTHON_VERSION}} --channel conda-forge python={{PYTHON_VERSION}}
+    sudo /opt/python/{{PYTHON_VERSION}}/bin/pip install --upgrade pip setuptools wheel
+    # make jupyter kernel
+    sudo /opt/python/{{PYTHON_VERSION}}/bin/pip install ipykernel
+    sudo /opt/python/{{PYTHON_VERSION}}/bin/python -m ipykernel install --name py{{PYTHON_VERSION}} --display-name "Python {{PYTHON_VERSION}}"
+
+
+# -----------------------------------------------------------------------------
+# Linux mgmt
+# -----------------------------------------------------------------------------
+
+add-user name password:
+    #!/bin/bash
+    sudo useradd --create-home --home-dir /home/{{name}} -s /bin/bash {{name}};
+    echo -e '{{password}}\n{{password}}' | sudo passwd {{name}};

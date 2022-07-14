@@ -1,4 +1,4 @@
-# RStudio Workbench High Availability
+# RStudio Workbench Single Server
 
 ![](infra.drawio.png)
 
@@ -60,12 +60,14 @@ pulumi up
 
 Visit RSW in your browser:
 
-```bash
+```
 just server-open
 ```
 
-Start a few new sessions. Verify that the sessions are being balanced across the servers.
+Login and start some new sessions.
+
+You can also ssh into the ec2 instances for any debugging.
 
 ```bash
-just server-load-status
+just server-ssh
 ```

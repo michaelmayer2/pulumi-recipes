@@ -47,9 +47,8 @@ export AWS_SECRET_ACCESS_KEY=<YOUR_SECRET_ACCESS_KEY>
 
 ## Recipes
 
-| Name                                                                            | Description                                                                 | Architecture                                                    |
-| ------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| [rsw-single-server-local-launcher](recipes/rsw-single-server-local-launcher/)   | A single server deployment of RStudio Workbench with code-server installed. | ![](recipes/rsw-single-server-local-launcher/infra.drawio.png)  |
-| [rsw-ha](recipes/rsw-ha/)                                                       | A two server high availability RStudio Workbench deployment.                | ![](recipes/rsw-ha/infra.drawio.png)                            |
-
-
+| Name                                                         | Description                                                  | Architecture                                                 |
+| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [rsw-single-server](recipes/rsw-single-server/)              | A single server deployment of RStudio Workbench with R and Python installed. This is the most simple deployment recipe. It has no customized configurations and requires only a single EC2 instance. | ![](recipes/rsw-single-server-local-launcher/infra.drawio.png) |
+| [rsw-single-server-local-launcher](recipes/rsw-single-server-local-launcher/) | A single server deployment of RStudio Workbench with R, Python and code-server installed. This deployment uses local launcher to enable code-server sessions. With this recipe you can also configure SSL, and easily switch between the daily build and the latest stable build. | ![](recipes/rsw-single-server-local-launcher/infra.drawio.png) |
+| [rsw-ha](recipes/rsw-ha/)                                    | A two server high availability RStudio Workbench deployment with R installed. This recipe will procure two EC2 instances, a Postgres database, and an EFS drive to enable high availability. | ![](recipes/rsw-ha/infra.drawio.png)                         |
