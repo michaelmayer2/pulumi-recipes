@@ -1,4 +1,4 @@
-# RStudio Workbench Single Server
+# RStudio Workbench High availability setup.
 
 ![](infra.drawio.png)
 
@@ -60,6 +60,14 @@ pulumi up
 
 Visit RSW in your browser:
 
-```bash
+```
 just server-open
+```
+
+Login and start some new sessions.
+
+You can also ssh into the ec2 instances for any debugging.
+
+```bash
+just server-ssh
 ```
