@@ -47,8 +47,9 @@ export AWS_SECRET_ACCESS_KEY=<YOUR_SECRET_ACCESS_KEY>
 
 ## Recipes
 
-| Name                                             | Descritption                                                                | Architecture                                    |
-| ------------------------------------------------ | --------------------------------------------------------------------------- | ----------------------------------------------- |
-| [rsw-single-server**](recipes/rsw-single-server) | A single server deployment of RStudio Workbench with code-server installed. | ![](recipes/rsw-single-server/infra.drawio.png) |
+| Name                                                                            | Description                                                                 | Architecture                                                    |
+| ------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| [rsw-single-server-local-launcher](recipes/rsw-single-server-local-launcher/)   | A single server deployment of RStudio Workbench with code-server installed. | ![](recipes/rsw-single-server-local-launcher/infra.drawio.png)  |
+| [rsw-ha](recipes/rsw-ha/)                                                       | A two server high availability RStudio Workbench deployment.                | ![](recipes/rsw-ha/infra.drawio.png)                            |
 
 
