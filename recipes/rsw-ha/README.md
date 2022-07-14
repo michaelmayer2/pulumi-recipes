@@ -1,4 +1,4 @@
-# RStudio Workbench Single Server
+# RStudio Workbench High Availability
 
 ![](infra.drawio.png)
 
@@ -62,4 +62,10 @@ Visit RSW in your browser:
 
 ```bash
 just server-open
+```
+
+Start a few new sessions. Verify that the sessions are being balanced across the servers.
+
+```bash
+just server-load-status
 ```

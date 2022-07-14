@@ -1,4 +1,4 @@
-# RStudio Workbench High availability setup.
+# RStudio Workbench Single Server
 
 ![](infra.drawio.png)
 
