@@ -1,0 +1,141 @@
+set dotenv-load
+
+EFS_ID := env_var("EFS_ID")  # For example: 'fs-0ae474bb0403fc7c6'
+RSW_LICENSE := env_var("RSW_LICENSE")
+
+# -----------------------------------------------------------------------------
+# Build RSW
+# -----------------------------------------------------------------------------
+
+# Install RStudio workbench and all of the dependencies
+build-rsw: 
+    # Basic setup
+    just install-linux-tools 
+    
+    # Set up shared drive
+    just install-efs-utils
+    just mount-efs
+    sudo mkdir -p /mnt/efs/rstudio-server/shared-storage
+    just generate-cookie-key
+    
+    # Add some test users
+    just add-user sam password
+    just add-user jake password
+    just add-user olivia password
+
+    # Install RSW and required dependencies
+    just install-r 
+    just symlink-r
+    just install-rsw
+    sudo cp -r /etc/rstudio /etc/rstudio-original-conf-files
+
+    # Set up config files
+    just copy-config-files
+    
+    # Restart
+    sudo rstudio-server restart
+
+# -----------------------------------------------------------------------------
+# Helpers
+# -----------------------------------------------------------------------------
+
+restart:
+    sudo rstudio-server restart
+
+restart-cluster:
+    sudo rstudio-server reset-cluster
+
+restart-launcher:
+    sudo rstudio-launcher restart
+
+status:
+    sudo rstudio-server status
+
+status-load-balancer:
+    curl http://localhost:8787/load-balancer/status
+
+logs:
+    sudo tail /var/log/rstudio/rstudio-server/rserver.log
+
+list-nodes:
+    sudo rstudio-server list-nodes
+
+edit:
+    sudo vim /etc/rstudio/rserver.conf
+
+edit-database:
+    sudo vim /etc/rstudio/database.conf
+
+edit-load-balancer:
+    sudo vim /etc/rstudio/load-balancer
+
+# -----------------------------------------------------------------------------
+# Install
+# -----------------------------------------------------------------------------
+
+install-linux-tools:
+    sudo apt-get update
+    sudo apt-get update
+    sudo apt-get install -y tree
+    sudo apt-get install -y bat
+    sudo apt-get install -y gdebi-core
+    echo "alias bat='batcat --paging never'" >> ~/.bashrc
+
+install-rsw:
+    curl -O https://download2.rstudio.org/server/bionic/amd64/rstudio-workbench-2022.02.0-443.pro2-amd64.deb
+    sudo gdebi -n rstudio-workbench-2022.02.0-443.pro2-amd64.deb 
+    sudo rstudio-server license-manager activate {{RSW_LICENSE}}
+
+install-r r_version='4.1.2':
+    curl -O https://cdn.rstudio.com/r/ubuntu-2004/pkgs/r-{{r_version}}_1_amd64.deb
+    sudo gdebi r-{{r_version}}_1_amd64.deb -n
+
+copy-config-files:
+    sudo cp ~/rserver.conf /etc/rstudio/rserver.conf
+    sudo cp ~/load-balancer /etc/rstudio/load-balancer
+    sudo cp ~/database.conf /etc/rstudio/database.conf
+
+# -----------------------------------------------------------------------------
+# EFS Mount
+# -----------------------------------------------------------------------------
+
+install-efs-utils:
+    #!/bin/bash
+    set -euxo pipefail
+    sudo apt-get -y install binutils
+    git clone https://github.com/aws/efs-utils
+    cd efs-utils
+    ./build-deb.sh
+    sudo apt-get -y install ./build/amazon-efs-utils*deb
+
+set-efs-conf:
+    #!/bin/bash
+    sudo bash -c 'cat <<EOF >> /etc/fstab
+    # mount efs
+    {{EFS_ID}}:/ /mnt/efs efs defaults,_netdev 0 0
+    EOF'
+
+mount-efs:
+    sudo mkdir -p /mnt/efs;
+    sudo mount -t efs -o tls {{EFS_ID}}:/ /mnt/efs;
+    just set-efs-conf
+
+# -----------------------------------------------------------------------------
+# Linux mgmt
+# -----------------------------------------------------------------------------
+
+add-user name password:
+    #!/bin/bash
+    sudo mkdir -p /mnt/efs/home
+    sudo useradd --create-home --home-dir /mnt/efs/home/{{name}} -s /bin/bash {{name}};
+    echo -e '{{password}}\n{{password}}' | sudo passwd {{name}};
+
+generate-cookie-key:
+    sudo apt-get update
+    sudo apt-get install -y uuid
+    sudo sh -c "echo `uuid` > /mnt/efs/rstudio-server/secure-cookie-key"
+    sudo chmod 0600 /mnt/efs/rstudio-server/secure-cookie-key
+
+symlink-r r_version='4.1.2':
+    sudo ln -s /opt/R/{{r_version}}/bin/R /usr/local/bin/R
+    sudo ln -s /opt/R/{{r_version}}/bin/Rscript /usr/local/bin/Rscript
