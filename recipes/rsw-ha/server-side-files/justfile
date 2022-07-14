@@ -95,6 +95,10 @@ copy-config-files:
     sudo cp ~/load-balancer /etc/rstudio/load-balancer
     sudo cp ~/database.conf /etc/rstudio/database.conf
 
+# -----------------------------------------------------------------------------
+# EFS Mount
+# -----------------------------------------------------------------------------
+
 install-efs-utils:
     #!/bin/bash
     set -euxo pipefail
@@ -103,6 +107,18 @@ install-efs-utils:
     cd efs-utils
     ./build-deb.sh
     sudo apt-get -y install ./build/amazon-efs-utils*deb
+
+set-efs-conf:
+    #!/bin/bash
+    sudo bash -c 'cat <<EOF >> /etc/fstab
+    # mount efs
+    {{EFS_ID}}:/ /mnt/efs efs defaults,_netdev 0 0
+    EOF'
+
+mount-efs:
+    sudo mkdir -p /mnt/efs;
+    sudo mount -t efs -o tls {{EFS_ID}}:/ /mnt/efs;
+    just set-efs-conf
 
 # -----------------------------------------------------------------------------
 # Linux mgmt
@@ -113,10 +129,6 @@ add-user name password:
     sudo mkdir -p /mnt/efs/home
     sudo useradd --create-home --home-dir /mnt/efs/home/{{name}} -s /bin/bash {{name}};
     echo -e '{{password}}\n{{password}}' | sudo passwd {{name}};
-
-mount-efs:
-    sudo mkdir -p /mnt/efs;
-    sudo mount -t efs -o tls {{EFS_ID}}:/ /mnt/efs;
 
 generate-cookie-key:
     sudo apt-get update

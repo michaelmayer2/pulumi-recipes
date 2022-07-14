@@ -1,18 +1,10 @@
 LOG_LEVEL := "3"
 LOG_FILE := "_logs.txt"
 
-write:
-    #!/bin/zsh
-    cat <<EOF > tmp-config.txt
-    line 1
-    line 2
-    EOF
 
-ssh num="1":
-    ssh \
-        -i ${AWS_PRIVATE_KEY_PATH} \
-        -o StrictHostKeyChecking=no \
-        ubuntu@$(pulumi stack output rsw_{{num}}_public_dns)
+# ------------------------------------------------------------------------------
+# Pulumi
+# ------------------------------------------------------------------------------
 
 up:
     pulumi up -y --logtostderr -v={{LOG_LEVEL}} 2> {{LOG_FILE}}
@@ -20,10 +12,44 @@ up:
 destroy:
     pulumi destroy -y --logtostderr -v={{LOG_LEVEL}} 2> {{LOG_FILE}}
 
-open:
+# ------------------------------------------------------------------------------
+# Server management
+# ------------------------------------------------------------------------------
+
+server-open:
     open http://$(pulumi stack output rsw_1_public_ip):8787
     open http://$(pulumi stack output rsw_2_public_ip):8787
 
-ip:
+server-ip:
     echo $(pulumi stack output rsw_1_public_ip)
     echo $(pulumi stack output rsw_2_public_ip)
+
+server-ssh num="1":
+    ssh \
+        -i key.pem \
+        -o StrictHostKeyChecking=no \
+        ubuntu@$(pulumi stack output rsw_{{num}}_public_dns)
+
+server-load-status num="1":
+    ssh \
+        -i key.pem \
+        -o StrictHostKeyChecking=no \
+        ubuntu@$(pulumi stack output rsw_{{num}}_public_dns) \
+        'curl http://localhost:8787/load-balancer/status'
+
+# ------------------------------------------------------------------------------
+# KeyPairs
+# ------------------------------------------------------------------------------
+
+# Create a new keypair
+key-pair-new:
+    just key-pair-delete
+    just key-pair-new-script
+    chmod 400 key.pem
+    cat key.pub | pulumi config set public_key
+
+key-pair-delete:
+    rm -f key.pem key.pub
+
+key-pair-new-script:
+    ./venv/bin/python scripts/new_keypair.py

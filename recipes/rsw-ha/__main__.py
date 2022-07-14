@@ -231,14 +231,15 @@ def main():
                 "server-side-files/config/rserver.conf",
                 "~/rserver.conf",
                 pulumi.Output.all().apply(lambda x: create_template("server-side-files/config/rserver.conf").render())
-            )
+
+            ),
         ]
 
         command_copy_config_files = []
         for f in server_side_files:
             command_copy_config_files.append(
                 remote.Command(
-                    f"copy {f.file_out}",
+                    f"copy {f.file_out} server {name}",
                     create=pulumi.Output.concat('echo "', f.template_render_command, f'" > {f.file_out}'),
                     connection=connection, 
                     opts=pulumi.ResourceOptions(depends_on=[server]),
