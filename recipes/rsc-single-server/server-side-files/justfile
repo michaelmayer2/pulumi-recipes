@@ -1,0 +1,59 @@
+set dotenv-load
+
+RSC_LICENSE := env_var("RSC_LICENSE")
+R_VERSION := env_var_or_default("R_VERSION", "4.1.2")
+PYTHON_VERSION := env_var_or_default("PYTHON_VERSION", "3.10.4")
+
+# -----------------------------------------------------------------------------
+# Build RSC
+# -----------------------------------------------------------------------------
+
+# Install RStudio Connect and all of the dependencies
+build-rsc: 
+    # Basic setup
+    sudo apt-get update
+    sudo apt-get update
+    sudo apt-get install -y gdebi-core
+
+    # Install RSC and required dependencies
+    just install-r 
+    just symlink-r
+    # just install-python
+    just install-rsc
+    just copy-config-files
+
+    # Restart
+    sudo systemctl restart rstudio-connect
+
+# -----------------------------------------------------------------------------
+# Install
+# -----------------------------------------------------------------------------
+
+install-rsc:
+    curl -O https://cdn.rstudio.com/connect/2022.07/rstudio-connect_2022.07.0~ubuntu20_amd64.deb
+    sudo gdebi -n rstudio-connect_2022.07.0~ubuntu20_amd64.deb
+    sudo /opt/rstudio-connect/bin/license-manager activate {{RSC_LICENSE}}
+
+install-r:
+    curl -O https://cdn.rstudio.com/r/ubuntu-2004/pkgs/r-{{R_VERSION}}_1_amd64.deb
+    sudo gdebi -n r-{{R_VERSION}}_1_amd64.deb
+
+symlink-r:
+    sudo ln -s /opt/R/{{R_VERSION}}/bin/R /usr/local/bin/R
+    sudo ln -s /opt/R/{{R_VERSION}}/bin/Rscript /usr/local/bin/Rscript
+
+install-python:
+    # https://docs.rstudio.com/resources/install-python/
+    # install python
+    sudo mkdir /opt/python
+    sudo curl -fsSL -o /opt/python/miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh 
+    sudo chmod 755 /opt/python/miniconda.sh
+    sudo /opt/python/miniconda.sh -b -p /opt/python/miniconda
+    sudo /opt/python/miniconda/bin/conda create --quiet --yes --prefix /opt/python/{{PYTHON_VERSION}} --channel conda-forge python={{PYTHON_VERSION}}
+    sudo /opt/python/{{PYTHON_VERSION}}/bin/pip install --upgrade pip setuptools wheel
+    # make jupyter kernel
+    sudo /opt/python/{{PYTHON_VERSION}}/bin/pip install ipykernel
+    sudo /opt/python/{{PYTHON_VERSION}}/bin/python -m ipykernel install --name py{{PYTHON_VERSION}} --display-name "Python {{PYTHON_VERSION}}"
+
+copy-config-files:
+    sudo cp ~/rstudio-connect.gcfg /etc/rstudio-connect/rstudio-connect.gcfg

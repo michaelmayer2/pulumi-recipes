@@ -1,0 +1,6 @@
+name: rsc-single-server
+runtime:
+  name: python
+  options:
+    virtualenv: venv
+description: Deploy a single server RSC instance.

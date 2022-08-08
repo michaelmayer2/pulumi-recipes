@@ -1,0 +1,51 @@
+# Pulumi logging options
+LOG_LEVEL := "3"
+LOG_FILE := "_logs.txt"
+
+# ------------------------------------------------------------------------------
+# General
+# ------------------------------------------------------------------------------
+clean:
+    rm -f key.pem
+    rm key.pub
+    rm -r __pycache__
+    rm -r venv
+# ------------------------------------------------------------------------------
+# Server related
+# ------------------------------------------------------------------------------
+
+server-ssh:
+    ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@$(pulumi stack output rsc_public_dns)
+
+server-open:
+    open "http://$(pulumi stack output rsc_public_ip):3939"
+
+# ------------------------------------------------------------------------------
+# pulumi related
+# ------------------------------------------------------------------------------
+
+# Run pulumi up -y
+pulumi-up:
+    pulumi up -y --logtostderr -v={{LOG_LEVEL}} 2> {{LOG_FILE}}
+
+# Run pulumi destory -y
+pulumi-destroy:
+    pulumi destroy -y --logtostderr -v={{LOG_LEVEL}} 2> {{LOG_FILE}}
+
+# ------------------------------------------------------------------------------
+# KeyPairs
+# ------------------------------------------------------------------------------
+
+# Create a new keypair
+key-pair-new:
+    just key-pair-delete
+    just key-pair-new-script
+    chmod 400 key.pem
+    cat key.pub | pulumi config set public_key
+
+key-pair-delete:
+    rm -f key.pem key.pub
+
+key-pair-new-script:
+    ./venv/bin/python scripts/new_keypair.py
+
