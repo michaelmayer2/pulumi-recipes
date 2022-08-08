@@ -1,0 +1,25 @@
+# /etc/rstudio-connect/rstudio-connect.gcfg
+
+[Server]
+Address = http://{{rsc_ip_address}}:3939
+EmailProvider = "SMTP"
+SenderEmail = "from@example.com"
+
+[SMTP]
+Host = "smtp.mailtrap.io"
+Port = 587
+User = {{mail_trap_user}}
+Password = {{mail_trap_password}}
+
+[HTTP]
+Listen = ":3939"
+NoWarning = true
+
+[Authentication]
+Provider = "password"
+
+[RPackageRepository "CRAN"]
+URL = "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"
+
+[RPackageRepository "RSPM"]
+URL = "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"
