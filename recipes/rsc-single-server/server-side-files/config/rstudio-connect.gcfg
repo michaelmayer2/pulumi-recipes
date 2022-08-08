@@ -23,7 +23,3 @@ URL = "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"
 
 [RPackageRepository "RSPM"]
 URL = "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"
-
-[Applications]
-ViewerOnDemandReports = false
-ViewerCustomizedReports = false

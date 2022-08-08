@@ -190,11 +190,11 @@ def main():
     # Build
     # --------------------------------------------------------------------------
 
-    # command_build_rsc = remote.Command(
-    #     f"build rsc", 
-    #     create="""export PATH="$PATH:$HOME/bin"; just build-rsc""", 
-    #     connection=connection, 
-    #     opts=pulumi.ResourceOptions(depends_on=[command_copy_justfile])
-    # )
+    command_build_rsc = remote.Command(
+        f"build rsc", 
+        create="""export PATH="$PATH:$HOME/bin"; just build-rsc""", 
+        connection=connection, 
+        opts=pulumi.ResourceOptions(depends_on=[command_copy_justfile, command_copy_config_files])
+    )
 
 main()
