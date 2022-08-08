@@ -21,7 +21,7 @@ This deployment uses <mailtrap.io> to act as a free SMPT server. This is useful 
 
 ![mailtrap screenshot](imgs/mailtrap-settings.png)
 
-> When you create new users for testing you should use the email `to@example.com` for all users. When new users sign up you will then be able to view the confirmation email in your mailtrap inbox.
+> When you create new users for testing you should use the email `to@example.com` for all users. When new users sign up you will then be able to view the confirmation email in your mailtrap inbox. Note that the first user who sings up will automatically be assigned the admin. All future users will not be admins and need to verify using mailtrap.
 
 ### Step 2: Log into AWS
 
