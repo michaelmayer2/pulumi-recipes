@@ -4,15 +4,12 @@ import hashlib
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from textwrap import dedent
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 import jinja2
 import pulumi
-from Crypto.PublicKey import RSA
 from pulumi_aws import ec2, efs, rds
 from pulumi_command import remote
-
 
 # ------------------------------------------------------------------------------
 # Helper functions
