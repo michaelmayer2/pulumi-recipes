@@ -18,7 +18,7 @@ build-rsc:
     # Install RSC and required dependencies
     just install-r 
     just symlink-r
-    # just install-python
+    just install-python
     just install-rsc
     just copy-config-files
 
