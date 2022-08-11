@@ -49,11 +49,8 @@ symlink-r:
 install-python:
     # https://docs.rstudio.com/resources/install-python/
     # install python
-    sudo mkdir /opt/python
-    sudo curl -fsSL -o /opt/python/miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh 
-    sudo chmod 755 /opt/python/miniconda.sh
-    sudo /opt/python/miniconda.sh -b -p /opt/python/miniconda
-    sudo /opt/python/miniconda/bin/conda create --quiet --yes --prefix /opt/python/{{PYTHON_VERSION}} --channel conda-forge python={{PYTHON_VERSION}}
+    curl -O https://cdn.rstudio.com/python/ubuntu-2004/pkgs/python-{{PYTHON_VERSION}}_1_amd64.deb
+    sudo gdebi -n python-{{PYTHON_VERSION}}_1_amd64.deb
     sudo /opt/python/{{PYTHON_VERSION}}/bin/pip install --upgrade pip setuptools wheel
     # make jupyter kernel
     sudo /opt/python/{{PYTHON_VERSION}}/bin/pip install ipykernel
