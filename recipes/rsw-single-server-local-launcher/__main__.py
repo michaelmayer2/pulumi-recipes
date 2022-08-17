@@ -51,8 +51,8 @@ def get_latest_build(daily: bool) -> str:
         link = data["products"]["workbench"]["platforms"]["bionic"]["link"]
         filename = data["products"]["workbench"]["platforms"]["bionic"]["filename"]
     else:
-        link = "https://download2.rstudio.org/server/bionic/amd64/rstudio-workbench-2022.02.3-492.pro3-amd64.deb"
-        filename = "rstudio-workbench-2022.02.3-492.pro3-amd64.deb"
+        link = "https://download2.rstudio.org/server/bionic/amd64/rstudio-workbench-2022.07.1-554.pro3-amd64.deb"
+        filename = "rstudio-workbench-2022.07.1-554.pro3-amd64.deb"
     return (link, filename)
 
 
