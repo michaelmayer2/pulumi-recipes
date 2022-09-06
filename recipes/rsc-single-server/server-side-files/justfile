@@ -47,6 +47,7 @@ install-python:
     # install python
     curl -O https://cdn.rstudio.com/python/ubuntu-2004/pkgs/python-{{PYTHON_VERSION}}_1_amd64.deb
     sudo gdebi -n python-{{PYTHON_VERSION}}_1_amd64.deb
+    sudo /opt/python/{{PYTHON_VERSION}}/bin/python3 -m pip install --upgrade pip setuptools wheel
 
 
 copy-config-files:

@@ -10,7 +10,7 @@ server-ssh:
     ssh -i key.pem -o StrictHostKeyChecking=no ubuntu@$(pulumi stack output rsw_public_dns)
 
 server-open:
-    open {{ if RSW_SSL == "true" { "https://$(pulumi stack output rsw_public_dns)" } else { "http://$(pulumi stack output rsw_public_ip):8787" } }}
+    open http://$(pulumi stack output rsw_public_ip):8787
 
 # ------------------------------------------------------------------------------
 # pulumi related
